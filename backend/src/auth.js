@@ -21,7 +21,10 @@ export const recruiterLogin = async (req, resp) => {
         }
         req.session.Rid = user._id;
         req.session.email = email;
-        return toast(resp, '/Rdashboard', 'Login successful! Welcome back 👋', 'success');
+        req.session.save((err) => {
+            if (err) console.error('Session save error:', err);
+            return toast(resp, '/Rdashboard', 'Login successful! Welcome back 👋', 'success');
+        });
     } catch (error) {
         console.error('recruiterLogin error:', error);
         return toast(resp, '/recruiter/login', 'Internal server error. Try again.', 'error');
@@ -75,7 +78,10 @@ export const candidateLogin = async (req, res) => {
         }
         req.session.userId = email;
         req.session.candidateId = user._id;
-        return toast(res, '/dashboard', 'Login successful! Welcome back 👋', 'success');
+        req.session.save((err) => {
+            if (err) console.error('Session save error:', err);
+            return toast(res, '/dashboard', 'Login successful! Welcome back 👋', 'success');
+        });
     } catch (error) {
         console.error('candidateLogin error:', error);
         return toast(res, '/candidate/login', 'Internal server error. Try again.', 'error');
