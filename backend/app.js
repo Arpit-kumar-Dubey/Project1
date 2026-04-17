@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import helmet from 'helmet';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import connectDB from './config/db.js';
 import path from 'path';
 import {
@@ -28,6 +29,10 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'job_portal_secret_fallback_key_2026',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URI,
+        collectionName: 'sessions', // Use MongoDB for session persistence
+    }),
     cookie: {
         maxAge: 60 * 60 * 1000,  // 1 hour
         httpOnly: true,
