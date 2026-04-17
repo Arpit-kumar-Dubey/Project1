@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // ─── Session ─────────────────────────────────────────────────────────
+app.set('trust proxy', 1); // Trust first proxy (Render/Heroku/etc)
 app.use(session({
     secret: process.env.SESSION_SECRET || 'job_portal_secret_fallback_key_2026',
     resave: false,
