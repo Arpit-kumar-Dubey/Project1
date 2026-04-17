@@ -1,52 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Posted Jobs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posted Jobs - Job Portal</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">Job Portal</a>
-            <ul class="nav-links">
-                <!-- <li><a href="/8">Post Job</a></li> -->
-                <li><a href="/Rdashboard">Back</a></li>
+            <a href="/" class="navbar-brand">🚀 Job Portal</a>
+            <ul class="nav-links" id="nav-links-list">
+                <li><a href="/Rdashboard">Dashboard</a></li>
+                <li><a href="/recruiter/post-job">Post Job</a></li>
+                <li><a href="/recruiter/view-applicants">Applicants</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
         <div class="page-header">
-            <h1>Your Posted Jobs</h1>
-            <p>Manage and track your job postings</p>
+            <h1>📋 Your Posted Jobs</h1>
+            <p>Manage and track all your job postings</p>
         </div>
 
         <div class="table-container">
+            <% if (data && data.length > 0) { %>
             <table>
                 <thead>
                     <tr>
-                        
                         <th>Title</th>
                         <th>Company</th>
                         <th>Location</th>
-                        <th>description</th>
-                        <th>PostedDate</th>
+                        <th>Description</th>
+                        <th>Posted Date</th>
                     </tr>
                 </thead>
                 <tbody>
                   <%data.forEach(data=>{%>
                     <tr>
-                        <td><%=data.title%></td>
+                        <td><strong><%=data.title%></strong></td>
                         <td><%=data.company%></td>
-                        <td><%=data.location%></td>
-                        <td><%=data.description%></td>
-                        <td><%=data.postedDate%></td>
-                       
+                        <td>📍 <%=data.location%></td>
+                        <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><%=data.description%></td>
+                        <td>📅 <%=data.postedDate%></td>
                     </tr>
                     <%})%>
                 </tbody>
             </table>
+            <% } else { %>
+            <div style="text-align:center;padding:60px 20px;">
+                <div style="font-size:60px;margin-bottom:16px;">📋</div>
+                <h3 style="color:#7c2d12;font-size:20px;margin-bottom:8px;">No Jobs Posted Yet</h3>
+                <p style="color:#92400e;margin-bottom:24px;">You haven't posted any jobs yet.</p>
+                <a href="/recruiter/post-job" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">➕ Post Your First Job</a>
+            </div>
+            <% } %>
         </div>
     </div>
+
+<%- include('partials/footer') %>
 </body>
 </html>

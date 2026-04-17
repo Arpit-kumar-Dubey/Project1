@@ -1,35 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>View Applicants</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Applicants - Job Portal</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">Job Portal</a>
-            <ul class="nav-links">
+            <a href="/" class="navbar-brand">🚀 Job Portal</a>
+            <ul class="nav-links" id="nav-links-list">
                 <li><a href="/recruiter/view-posted-jobs">Posted Jobs</a></li>
-                <li><a href="/Rdashboard">Back</a></li>
+                <li><a href="/recruiter/post-job">Post Job</a></li>
+                <li><a href="/Rdashboard">Dashboard</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
         <div class="page-header">
-            <h1>Job Applicants</h1>
+            <h1>👥 Job Applicants</h1>
             <p>Review and manage applications for your job postings</p>
         </div>
 
         <div class="table-container">
+            <% if (data && data.length > 0) { %>
             <table>
                 <thead>
                     <tr>
-                       
                         <th>Job Title</th>
                         <th>Candidate Name</th>
                         <th>Email</th>
-                        <th>Application Date</th>
+                        <th>Applied Date</th>
                         <th>Salary</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -37,26 +41,40 @@
                 </thead>
                 <tbody>
                     <%data.forEach(data=>{%>
-            <tr>
-                <td><%=data.title%></td>
-                <td><%=data.name%></td>
-                <td><%=data.candidate%></td>
-                <td><%=data.appliedAt%></td>
-                <td><%=data.salary%></td>
-                <td><%=data.status%></td>
-                 <td>
-                    <form action="/viewCandidate" method="post">
-                    <input type="hidden"  name="Email" value="<%=data.candidate%>">
-                    <input type="hidden" name="idJob" value="<%=data._id%>">
-                  <button class="btn-small btn-view">View</button>
-                  </form>
-                           
+                    <tr>
+                        <td><strong><%=data.title%></strong></td>
+                        <td><%=data.name%></td>
+                        <td><%=data.candidate%></td>
+                        <td><%=data.appliedAt%></td>
+                        <td><%=data.salary%></td>
+                        <td>
+                            <span class="status-badge <% if(data.status==='Accepted'){%>status-approved<%}else if(data.status==='Rejected'){%>status-rejected<%}else{%>status-pending<%}%>">
+                                <%=data.status%>
+                            </span>
                         </td>
-            </tr>
-        <%})%>
+                        <td>
+                            <form action="/viewCandidate" method="post" style="display:inline;">
+                                <input type="hidden" name="Email" value="<%=data.candidate%>">
+                                <input type="hidden" name="idJob" value="<%=data._id%>">
+                                <button type="submit" class="btn-small btn-view" style="width:auto;">👁 View</button>
+                            </form>
+                            <a href="/Accept/<%=data._id%>" class="btn-small" style="background:linear-gradient(135deg,#22c55e,#16a34a);width:auto;">✅</a>
+                            <a href="/Reject/<%=data._id%>" class="btn-small btn-delete" style="width:auto;">❌</a>
+                        </td>
+                    </tr>
+                    <%})%>
                 </tbody>
             </table>
+            <% } else { %>
+            <div style="text-align:center;padding:60px 20px;">
+                <div style="font-size:60px;margin-bottom:16px;">👥</div>
+                <h3 style="color:#7c2d12;font-size:20px;margin-bottom:8px;">No Applicants Yet</h3>
+                <p style="color:#92400e;">Applicants will appear here once candidates apply to your jobs.</p>
+            </div>
+            <% } %>
         </div>
     </div>
+
+<%- include('partials/footer') %>
 </body>
 </html>

@@ -1,28 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Post Job</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Job - Job Portal</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">Job Portal</a>
-            <ul class="nav-links">
-                <li><a href="/Rdashboard">Back to Dashboard</a></li>
+            <a href="/" class="navbar-brand">🚀 Job Portal</a>
+            <ul class="nav-links" id="nav-links-list">
+                <li><a href="/Rdashboard">Dashboard</a></li>
+                <li><a href="/recruiter/view-posted-jobs">My Jobs</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
         <div class="page-header">
-            <h1>Update Job</h1>
-            <p>Share your job opportunity with qualified candidates</p>
+            <h1>✏️ Update Job</h1>
+            <p>Edit your job posting details</p>
         </div>
 
         <div class="form-container">
             <form method="POST" action="/recruiter/updateJob">
                 <input type="hidden" name="id" value="<%= result._id %>">
+
                 <div class="form-group">
                     <label for="title">Job Title</label>
                     <input type="text" id="title" name="title" placeholder="e.g., Senior Software Engineer" value="<%=result.title%>" required>
@@ -35,22 +40,24 @@
 
                 <div class="form-group">
                     <label for="location">Location</label>
-                    <input type="text" id="location" name="location" placeholder="e.g., New York, NY or Remote" v value="<%=result.location%>" required>
+                    <input type="text" id="location" name="location" placeholder="e.g., New York, NY or Remote" value="<%=result.location%>" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" value="<%=result.description%>" name="description" placeholder="Describe the job responsibilities and requirements"  required></textarea>
+                    <label for="salary">Salary</label>
+                    <input type="text" id="salary" name="salary" placeholder="e.g., ₹8 LPA or $60,000/year" value="<%=result.salary%>" required>
                 </div>
-                  <div class="form-group">
-                    <label for="location">Salary</label>
-                    <input type="text" value="<%=result.salary%>" id="location" name="salary" placeholder="Enter Salary...." required>
-                </div>
-               
 
-                <button type="submit">Post Job</button>
+                <div class="form-group">
+                    <label for="description">Job Description</label>
+                    <textarea id="description" name="description" placeholder="Describe the job responsibilities and requirements" required><%=result.description%></textarea>
+                </div>
+
+                <button type="submit">💾 Update Job</button>
             </form>
         </div>
     </div>
+
+<%- include('partials/footer') %>
 </body>
 </html>

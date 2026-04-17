@@ -1,97 +1,109 @@
-import express from 'express'
-const app=express();
+import express from 'express';
+const app = express();
 import dotenv from 'dotenv';
 dotenv.config();
-import helmet from "helmet";
-import mongoose from "mongoose";
-import session from "express-session";
-import connectDB from "./config/db.js";
+import helmet from 'helmet';
+import session from 'express-session';
+import connectDB from './config/db.js';
+import path from 'path';
+import {
+    getJobs, postJob, cDashboard, Rdashboard, view, apply,
+    saveJob, aplyed, savedJobs, updateJob, profile, CandidateUpdate,
+    filter, viewPosted, Applicants, deleteApply, deleteSaved,
+    deletePostedJob, EditPostedJob, Accept, Reject, viewCandidate
+} from './controllers/jobController.js';
+import { candidateLogin, c_register, recruiterRegister, recruiterLogin } from './src/auth.js';
+
+// ─── Static & View Setup ────────────────────────────────────────────
+const ab = path.resolve('../frontend/public');
+app.use(express.static(ab));
+app.set('views', path.resolve('../frontend/views'));
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// ─── Session ─────────────────────────────────────────────────────────
 app.use(session({
-  secret: 'my_super_secret_development_key',
-  resave: false,
-  saveUninitialized: false,
-   cookie: {
-    maxAge: 30 * 60 * 1000  // 30 minutes in milliseconds
-  }
+    secret: process.env.SESSION_SECRET || 'job_portal_secret_fallback_key_2026',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 60 * 60 * 1000,  // 1 hour
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
+    }
 }));
-//helmet security lagane ke liye middleware
-app.use(helmet());
-import path from 'path'
-import { getJobs, postJob ,cDashboard,Rdashboard,view,apply,saveJob,aplyed,savedJobs,updateJob,profile,CandidateUpdate,filter,viewPosted,Applicants,deleteApply,deleteSaved,deletePostedJob,EditPostedJob,Accept,Reject,viewCandidate} from './controllers/jobController.js';
-import {candidateLogin,c_register,recruiterRegister,recruiterLogin} from './src/auth.js';
-const dbName="demo"
-const ab=path.resolve('../frontend/public')
-app.use(express.static(ab))
-app.set('views', path.resolve('../frontend/views'))
-app.set('view engine','ejs')
-app.use(express.urlencoded({extended:true}))
-app.use(express.json())
+
+// ─── Security ────────────────────────────────────────────────────────
+app.use(helmet({
+    contentSecurityPolicy: false,
+}));
+
+// ─── Database ────────────────────────────────────────────────────────
 connectDB();
-app.get("/",(req,resp)=>{
-    resp.render("index")
-})
-//profile show karane ke liye hai ye route
-app.get("/candidate/profile",profile)
-//ye candidate ki information ko update karne ke liye 
-app.post("/candidate/update",CandidateUpdate)
 
-app.get("/candidate/register",(req,resp)=>{
-    resp.render("candidate_register")
-})
-//applyed jobs ko check karna dashboard se
-app.get("/3",aplyed);
-//saved jobs ko check karne ke liye
-app.get("/savedJobs",savedJobs);
-// app.get("/savejob/:id",saveJob)
-app.get("/candidate/login",(req,resp)=>{
-    resp.render('candidateLogin.ejs')
-})
-//Applyed job ko delete karne ke liye
-app.get("/deleteAppled/:id",deleteApply)
-//saved jobs ko delete karne ke liye
-app.get("/deleteSaved/:id",deleteSaved)
-//postedJob ko delete karne ke liye
-app.get("/deletePosted/:id",deletePostedJob)
-//Edit posted jobs
-app.get("/EditPostedJob/:id",EditPostedJob)
-//updated post request for updateJob
-app.post("/recruiter/updateJob",updateJob)
-//Accept candidate for job
-app.get("/Accept/:id",Accept)
-//Reject candidate for job
-app.get("/Reject/:id",Reject)
-//candidate ki profile view karne ke liye
-app.post("/viewCandidate",viewCandidate)
-app.get("/candidate/applied-jobs",(req,resp)=>{
-    resp.render('cnadidate_applied')
-})
-app.get("/recruiter/login",(req,resp)=>{
-    resp.render('recuiter_login')
-})
-app.get("/recruiter/post-job",(req,resp)=>{
-    resp.render('recuiter_postJob')
-})
+// ─── Public Routes ───────────────────────────────────────────────────
+app.get('/', (req, resp) => {
+    resp.render('index');
+});
+
+// Candidate Routes
+app.get('/candidate/register', (req, resp) => resp.render('candidate_register'));
+app.post('/candidate/register', c_register);
+app.get('/candidate/login', (req, resp) => resp.render('candidateLogin'));
+app.post('/12', candidateLogin);
+app.get('/dashboard', cDashboard);
+app.get('/candidate/profile', profile);
+app.post('/candidate/update', CandidateUpdate);
+app.get('/3', aplyed);
+app.get('/savedJobs', savedJobs);
+app.get('/deleteAppled/:id', deleteApply);
+app.get('/deleteSaved/:id', deleteSaved);
+app.get('/applyforjob/:id', apply);
+app.get('/saveJob/:id', saveJob);         // capital J — correct route
+app.post('/filter', filter);
 app.get('/candidate/view-jobs', getJobs);
-app.post("/recruiter/post-job",postJob)
-app.get("/recruiter/view-applicants",Applicants)
-app.post("/recruiter/login1",recruiterLogin)//isper
-//recruiter login ke liye hai ye
-app.get("/Rdashboard",Rdashboard);
-app.post("/12",candidateLogin)
-app.post("/filter",filter)//filter karne ke liye jobs ko
-app.get("/dashboard",cDashboard)
-app.post("/recruiter/register1",recruiterRegister)
-app.post("/candidate/register",c_register)
-app.get("/viewpostedJob/:id",view)
-//job apply karne ke liye route
-app.get("/applyforjob/:id",apply)
-app.get("/saveJob/:id",saveJob)
-app.get("/recruiter/view-posted-jobs",viewPosted)
-app.get("/recruiter/register",(req,resp)=>{
-    resp.render('recuiter_register')
-})
-const PORT = process.env.PORT || 3100;
 
+// Recruiter Routes
+app.get('/recruiter/register', (req, resp) => resp.render('recuiter_register'));
+app.post('/recruiter/register1', recruiterRegister);
+app.get('/recruiter/login', (req, resp) => resp.render('recuiter_login'));
+app.post('/recruiter/login1', recruiterLogin);
+app.get('/Rdashboard', Rdashboard);
+app.get('/recruiter/post-job', (req, resp) => resp.render('recuiter_postJob'));
+app.post('/recruiter/post-job', postJob);
+app.get('/recruiter/view-posted-jobs', viewPosted);
+app.get('/recruiter/view-applicants', Applicants);
+app.get('/viewpostedJob/:id', view);
+app.get('/EditPostedJob/:id', EditPostedJob);
+app.post('/recruiter/updateJob', updateJob);
+app.get('/deletePosted/:id', deletePostedJob);
+app.get('/Accept/:id', Accept);
+app.get('/Reject/:id', Reject);
+app.post('/viewCandidate', viewCandidate);
+
+// Logout (clears session)
+app.get('/logout', (req, resp) => {
+    req.session.destroy();
+    resp.redirect('/');
+});
+
+// ─── 404 Handler ─────────────────────────────────────────────────────
+app.use((req, resp) => {
+    resp.status(404).send(`
+        <!DOCTYPE html><html><head><title>404 - Not Found</title>
+        <link rel="stylesheet" href="/css/style.css"></head>
+        <body style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px;">
+        <div style="font-size:72px;">🔍</div>
+        <h1 style="color:#7c2d12;font-size:32px;font-weight:800;">Page Not Found</h1>
+        <p style="color:#92400e;">The page you're looking for doesn't exist.</p>
+        <a href="/" style="padding:12px 28px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">Go Home</a>
+        </body></html>
+    `);
+});
+
+// ─── Start Server ────────────────────────────────────────────────────
+const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

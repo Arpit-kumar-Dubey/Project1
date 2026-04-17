@@ -1,91 +1,83 @@
 import bcrypt from 'bcrypt';
 import Candidate from '../models/candidateModel.js';
 import Recruiter from '../models/recruiterModel.js';
-export const recruiterLogin=async(req,resp)=>{
-    try{
-        const{email,password}=req.body
-        const user= await Recruiter.findOne({email:email})
-         if (!user){
-           return resp.redirect("/recruiter/login?error=Invalid password or Email");
-        }
-        if(!await bcrypt.compare(password,user.password)){
-          return resp.redirect("/recruiter/login?error=Invalid password or Email");
-        }else{
-        req.session.Rid=user._id;
-        req.session.email=email;
-        resp.redirect("/Rdashboard")
-        }
-    }catch(error){
-        console.log(error)
-        resp.status(500).send("there are some internal error")
-    }
-};
-export const recruiterRegister=async(req,resp)=>{
-    try{
-        const db=req.app.locals.db;
-        const {name,email,password}=req.body
-        const user=await Recruiter.findOne({email:email})
-        const salt= await bcrypt.genSalt(10)
-        const hashed=await bcrypt.hash(password,salt)
-        const newUser={
-            name,
-            email,
-            password:hashed
-        }
-        if(!user){
-        const result=await Recruiter.create(newUser)
-        resp.render('index')
-        }else{
-            return resp.json({message: "User already exists" });
-        }
-        
-        
-    }catch(error){
-        resp.status(500).send("there are some error in your internal code")
-    }
-};
-export const c_register=async(req,resp)=>{
-    try{
-        const {name,email,password}=req.body
-    
-        const user=await Candidate.findOne({email:email})
-        if(!user){
-        const salt=await bcrypt.genSalt(10);
-        const hashed=await bcrypt.hash(password,salt);
-        const newuser={
-           name,email,password:hashed
-        }
-        const result=await Candidate.create(newuser)
-        resp.render("index")
-        }else{
-           return resp.json({ message: "User already exists" });
-        }
-        
 
-    }catch(error){
-        console.log(error)
-        resp.status(500).send("their are some internal error")
+// Helper: redirect with toast params
+const toast = (res, url, message, type = 'info') => {
+    const encoded = encodeURIComponent(message);
+    return res.redirect(`${url}?msg=${encoded}&type=${type}`);
+};
+
+export const recruiterLogin = async (req, resp) => {
+    try {
+        const { email, password } = req.body;
+        const user = await Recruiter.findOne({ email });
+        if (!user) {
+            return toast(resp, '/recruiter/login', 'Invalid email or password', 'error');
+        }
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return toast(resp, '/recruiter/login', 'Invalid email or password', 'error');
+        }
+        req.session.Rid = user._id;
+        req.session.email = email;
+        return toast(resp, '/Rdashboard', 'Login successful! Welcome back 👋', 'success');
+    } catch (error) {
+        console.error('recruiterLogin error:', error);
+        return toast(resp, '/recruiter/login', 'Internal server error. Try again.', 'error');
     }
 };
+
+export const recruiterRegister = async (req, resp) => {
+    try {
+        const { name, email, password } = req.body;
+        const existing = await Recruiter.findOne({ email });
+        if (existing) {
+            return toast(resp, '/recruiter/register', 'Account already exists. Please login.', 'warning');
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(password, salt);
+        await Recruiter.create({ name, email, password: hashed });
+        return toast(resp, '/recruiter/login', 'Registration successful! Please login.', 'success');
+    } catch (error) {
+        console.error('recruiterRegister error:', error);
+        return toast(resp, '/recruiter/register', 'Registration failed. Try again.', 'error');
+    }
+};
+
+export const c_register = async (req, resp) => {
+    try {
+        const { name, email, password } = req.body;
+        const existing = await Candidate.findOne({ email });
+        if (existing) {
+            return toast(resp, '/candidate/register', 'Account already exists. Please login.', 'warning');
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(password, salt);
+        await Candidate.create({ name, email, password: hashed });
+        return toast(resp, '/candidate/login', 'Registration successful! Please login.', 'success');
+    } catch (error) {
+        console.error('c_register error:', error);
+        return toast(resp, '/candidate/register', 'Registration failed. Try again.', 'error');
+    }
+};
+
 export const candidateLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
-      
-        const user = await Candidate.findOne({ email: email });
-
+        const user = await Candidate.findOne({ email });
         if (!user) {
-              return res.redirect("/candidate/login?error=Invalid password or Email");
+            return toast(res, '/candidate/login', 'Invalid email or password', 'error');
         }
-        if (!await bcrypt.compare(password,user.password)){
-             return res.redirect("/candidate/login?error=Invalid password or Email");
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return toast(res, '/candidate/login', 'Invalid email or password', 'error');
         }
-        req.session.userId=email;
-        req.session.candidateId=user._id;
-        res.redirect('/dashboard');
-
+        req.session.userId = email;
+        req.session.candidateId = user._id;
+        return toast(res, '/dashboard', 'Login successful! Welcome back 👋', 'success');
     } catch (error) {
-        console.log(error);
-        res.status(500).send("There is some internal error");
+        console.error('candidateLogin error:', error);
+        return toast(res, '/candidate/login', 'Internal server error. Try again.', 'error');
     }
 };
-//user.password !== password

@@ -1,57 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>View Jobs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications - Job Portal</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">Job Portal</a>
-            <ul class="nav-links">
-                <li><a href="/dashboard">Exit</a></li>
-                
+            <a href="/" class="navbar-brand">🚀 Job Portal</a>
+            <ul class="nav-links" id="nav-links-list">
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/savedJobs">Saved Jobs</a></li>
+                <li><a href="/candidate/profile">Profile</a></li>
             </ul>
         </div>
     </nav>
+
     <div class="container">
         <div class="page-header">
-            <h1>Your Applyed Jobs</h1>
-            <p>Browse and apply for exciting job opportunities</p>
+            <h1>📝 My Applications</h1>
+            <p>Track all your job applications and their statuses</p>
         </div>
 
         <div class="table-container">
+            <% if (data && data.length > 0) { %>
             <table>
                 <thead>
                     <tr>
-                       
-                        <th>Title</th>
+                        <th>Job Title</th>
                         <th>Company</th>
                         <th>Location</th>
-                        <th>Description</th>
-                        <th>salary</th>
+                        <th>Salary</th>
                         <th>Status</th>
-                        <th>Date</th>
+                        <th>Applied Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                      <%data.forEach(data=>{%>
                     <tr>
-                        <td><%=data.title%></td>
+                        <td><strong><%=data.title%></strong></td>
                         <td><%=data.company%></td>
-                        <td><%=data.location%></td>
-                        <td><%=data.description%></td>
-                        <td><%=data.salary%></td>
-                        <td><%=data.status%></td>
-                        <td><%=data.appliedAt%></td>
-                        <td><a class="delete" href="/deleteAppled/<%=data._id%>">Delete</a></td>
+                        <td>📍 <%=data.location%></td>
+                        <td>💰 <%=data.salary%></td>
+                        <td>
+                            <span class="status-badge <% if(data.status==='Accepted'){%>status-approved<%}else if(data.status==='Rejected'){%>status-rejected<%}else{%>status-pending<%}%>">
+                                <%=data.status%>
+                            </span>
+                        </td>
+                        <td>📅 <%=data.appliedAt%></td>
+                        <td>
+                            <a class="btn-small btn-delete" href="/deleteAppled/<%=data._id%>" style="width:auto;" onclick="return confirm('Remove this application?')">🗑 Remove</a>
+                        </td>
                     </tr>
                     <%})%>
-                  
                 </tbody>
             </table>
+            <% } else { %>
+            <div style="text-align:center;padding:60px 20px;">
+                <div style="font-size:60px;margin-bottom:16px;">📝</div>
+                <h3 style="color:#7c2d12;font-size:20px;margin-bottom:8px;">No Applications Yet</h3>
+                <p style="color:#92400e;margin-bottom:24px;">Start applying to jobs from your dashboard!</p>
+                <a href="/dashboard" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">View Jobs →</a>
+            </div>
+            <% } %>
         </div>
     </div>
+
+<%- include('partials/footer') %>
 </body>
 </html>

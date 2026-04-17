@@ -1,54 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>View Jobs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Jobs - Job Portal</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand">Job Portal</a>
-            <ul class="nav-links">
-                <li><a href="/dashboard">Exit</a></li>
-                
+            <a href="/" class="navbar-brand">🚀 Job Portal</a>
+            <ul class="nav-links" id="nav-links-list">
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/3">My Applications</a></li>
+                <li><a href="/candidate/profile">Profile</a></li>
             </ul>
         </div>
     </nav>
+
     <div class="container">
         <div class="page-header">
-            <h1>Your Saved Jobs</h1>
-            <p>Browse and apply for exciting job opportunities</p>
+            <h1>❤️ Saved Jobs</h1>
+            <p>Your bookmarked jobs — ready to apply when you are</p>
         </div>
 
         <div class="table-container">
+            <% if (data && data.length > 0) { %>
             <table>
                 <thead>
                     <tr>
-                        <th>Job ID</th>
                         <th>Title</th>
                         <th>Company</th>
                         <th>Location</th>
-                        <th>Description</th>
-                        <th>salary</th>
+                        <th>Salary</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                      <%data.forEach(data=>{%>
                     <tr>
-                        <td><%=data._id%></td>
-                        <td><%=data.title%></td>
+                        <td><strong><%=data.title%></strong></td>
                         <td><%=data.company%></td>
-                        <td><%=data.location%></td>
-                        <td><%=data.description%></td>
-                        <td><%=data.salary%></td>
-                        <td><a class="delete" href="/deleteSaved/<%=data._id%>">Delete</a></td>
+                        <td>📍 <%=data.location%></td>
+                        <td>💰 <%=data.salary%></td>
+                        <td>
+                            <a href="/applyforjob/<%=data.jobId%>" class="btn-small btn-view" style="width:auto;">🚀 Apply</a>
+                            <a class="btn-small btn-delete" href="/deleteSaved/<%=data._id%>" style="width:auto;" onclick="return confirm('Remove from saved?')">🗑 Remove</a>
+                        </td>
                     </tr>
                     <%})%>
-                  
                 </tbody>
             </table>
+            <% } else { %>
+            <div style="text-align:center;padding:60px 20px;">
+                <div style="font-size:60px;margin-bottom:16px;">❤️</div>
+                <h3 style="color:#7c2d12;font-size:20px;margin-bottom:8px;">No Saved Jobs</h3>
+                <p style="color:#92400e;margin-bottom:24px;">Browse jobs and save the ones you like!</p>
+                <a href="/dashboard" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">Browse Jobs →</a>
+            </div>
+            <% } %>
         </div>
     </div>
+
+<%- include('partials/footer') %>
 </body>
 </html>
