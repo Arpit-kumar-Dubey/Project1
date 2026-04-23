@@ -4,13 +4,13 @@ import PostedJob from '../models/postedModel.js';
 import Recruiter from '../models/recruiterModel.js';
 import SavedJob from '../models/savedModel.js';
 
-// Redirect helper with toast params
+
 const toast = (res, url, message, type = 'info') => {
     const encoded = encodeURIComponent(message);
     return res.redirect(`${url}?msg=${encoded}&type=${type}`);
 };
 
-// Redirect back with toast
+
 const toastBack = (res, req, message, type = 'error') => {
     const ref = req.get('Referer') || '/';
     const encoded = encodeURIComponent(message);
