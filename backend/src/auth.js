@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt';
 import Candidate from '../models/candidateModel.js';
 import Recruiter from '../models/recruiterModel.js';
 
-// Helper: redirect with toast params
 const toast = (res, url, message, type = 'info') => {
     const encoded = encodeURIComponent(message);
     return res.redirect(`${url}?msg=${encoded}&type=${type}`);
