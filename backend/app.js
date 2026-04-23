@@ -15,7 +15,6 @@ import {
 } from './controllers/jobController.js';
 import { candidateLogin, c_register, recruiterRegister, recruiterLogin } from './src/auth.js';
 
-// ─── Static & View Setup ────────────────────────────────────────────
 const ab = path.resolve('../frontend/public');
 app.use(express.static(ab));
 app.set('views', path.resolve('../frontend/views'));
@@ -23,37 +22,32 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ─── Session ─────────────────────────────────────────────────────────
-app.set('trust proxy', 1); // Trust first proxy (Render/Heroku/etc)
+app.set('trust proxy', 1); 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'job_portal_secret_fallback_key_2026',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
-        collectionName: 'sessions', // Use MongoDB for session persistence
+        collectionName: 'sessions',
     }),
     cookie: {
-        maxAge: 60 * 60 * 1000,  // 1 hour
+        maxAge: 60 * 60 * 1000, 
         httpOnly: true,
-        secure: false // Set to false to avoid issues behind proxies
+        secure: false 
     }
 }));
 
-// ─── Security ────────────────────────────────────────────────────────
 app.use(helmet({
     contentSecurityPolicy: false,
 }));
 
-// ─── Database ────────────────────────────────────────────────────────
 connectDB();
 
-// ─── Public Routes ───────────────────────────────────────────────────
 app.get('/', (req, resp) => {
     resp.render('index');
 });
 
-// Candidate Routes
 app.get('/candidate/register', (req, resp) => resp.render('candidate_register'));
 app.post('/candidate/register', c_register);
 app.get('/candidate/login', (req, resp) => resp.render('candidateLogin'));
@@ -70,7 +64,6 @@ app.get('/saveJob/:id', saveJob);         // capital J — correct route
 app.post('/filter', filter);
 app.get('/candidate/view-jobs', getJobs);
 
-// Recruiter Routes
 app.get('/recruiter/register', (req, resp) => resp.render('recuiter_register'));
 app.post('/recruiter/register1', recruiterRegister);
 app.get('/recruiter/login', (req, resp) => resp.render('recuiter_login'));
@@ -94,7 +87,6 @@ app.get('/logout', (req, resp) => {
     resp.redirect('/');
 });
 
-// ─── 404 Handler ─────────────────────────────────────────────────────
 app.use((req, resp) => {
     resp.status(404).send(`
         <!DOCTYPE html><html><head><title>404 - Not Found</title>
@@ -108,7 +100,6 @@ app.use((req, resp) => {
     `);
 });
 
-// ─── Start Server ────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
